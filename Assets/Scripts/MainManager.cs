@@ -12,16 +12,18 @@ public class MainManager : MonoBehaviour
 
     public Text ScoreText;
     public GameObject GameOverText;
+    public Text ScoreNameText;
     
     private bool m_Started = false;
     private int m_Points;
     
     private bool m_GameOver = false;
 
-    
     // Start is called before the first frame update
     void Start()
     {
+        UpdateScoreNameText();
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -55,6 +57,9 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
+            UpdateBestScore();
+            UpdateScoreNameText();
+
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -73,4 +78,23 @@ public class MainManager : MonoBehaviour
         m_GameOver = true;
         GameOverText.SetActive(true);
     }
+
+    // Technically should have MainUIHandler, but just do it here
+    private void UpdateBestScore()
+    {
+        if (GameManager.Instance != null)
+        {
+            int bestScore = GameManager.Instance.bestScore;
+            bestScore = Mathf.Max(bestScore, m_Points);
+            GameManager.Instance.UpdateBestScore(bestScore); // also update to file
+        }
+    }
+    public void UpdateScoreNameText()
+    {
+        if (GameManager.Instance != null)
+        {
+            ScoreNameText.text = "Best Score: " + GameManager.Instance.bestScore + " | " + "Name: " + GameManager.Instance.playerName;
+        }
+    }
+    // -----------------------
 }
